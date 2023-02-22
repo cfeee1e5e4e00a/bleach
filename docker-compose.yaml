@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+    database:
+        image: 'postgres:15-alpine'
+        restart: always
+        ports:
+            - '5432:5432'
+        volumes:
+            - database_data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: 'bleach'
+            POSTGRES_USER: 'cfeee1e5e4e00a'
+            POSTGRES_PASSWORD: 'uchansansan'
+
+    queue:
+        image: 'nats:2-alpine'
+        restart: always
+        ports:
+            - '4222:4222'
+
+    api:
+        build: './api'
+        restart: always
+        depends_on:
+            - database
+            - queue
+        ports:
+            - '3000:3000'
+
+    web:
+        build: './web'
+        restart: always
+        depends_on:
+            - api
+        ports:
+            - '80:80'
+
+volumes:
+    database_data:
