@@ -1,0 +1,23 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Demand {
+    id             Int          @id @default(autoincrement())
+    status         DemandStatus
+    suggests       Json?
+    migration_file String?
+}
+
+enum DemandStatus {
+    ON_EXPORTING
+    ON_ANALYZING
+    ON_VERIFICATION
+    ON_MIGRATION_GENERATION
+    DONE
+}

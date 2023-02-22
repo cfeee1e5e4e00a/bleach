@@ -1,0 +1,4 @@
+nats-py
+python-dotenv
+dataclasses-json
+aiohttp
