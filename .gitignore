@@ -27,6 +27,8 @@ cmake-build-*/
 
 out/
 
+**/*.egg-info
+
 .idea_modules/
 
 atlassian-ide-plugin.xml
