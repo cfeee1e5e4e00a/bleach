@@ -1,6 +1,7 @@
 {
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "./lib/**/*"
     ],
     "compilerOptions": {
         "baseUrl": ".",
@@ -13,6 +14,7 @@
             "ES2022"
         ],
         "strict": true,
-        "strictNullChecks": true
-    }
+        "strictNullChecks": true,
+        "composite": true
+    },
 }

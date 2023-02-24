@@ -21,7 +21,7 @@ async def main():
         payload: OnExportingMessage = OnExportingMessage.from_json(message.data.decode('UTF-8'))
         print(f'{datetime.now()} received {payload}')
         result = await run_exporter(payload)
-        await nats.publish('ON_ANALYZING', result.to_json().encode('UTF-8'))
+        await nats.publish('OnAnalyzing', result.to_json().encode('UTF-8'))
         print(f'{datetime.now()} sended {result}')
         async with aiohttp.ClientSession() as session:
             url = f'{os.environ.get("API_URL")}/api/v1/demands/{payload.demand_id}'
@@ -29,7 +29,7 @@ async def main():
             await session.put(url, json=body)
 
 
-    await nats.subscribe('ON_EXPORTING', cb=handle_message)
+    await nats.subscribe('OnExporting', 'Exporter', cb=handle_message)
 
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()

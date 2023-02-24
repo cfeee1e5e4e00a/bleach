@@ -1,38 +1,29 @@
-import { DemandStatus } from '@prisma/client';
+import EventEmitter from 'node:events';
 import { Router } from 'express';
-import { z } from 'zod';
 import HttpStatus from 'http-status';
 import { StringCodec } from 'nats';
+import {
+    type OnExportingMessage,
+    createDemandDtoSchema,
+    updateDemandDtoSchema,
+} from '../../../lib';
 import { nats, prisma } from '../..';
 
-const demandStatusScheme = z.nativeEnum(DemandStatus);
+class DemandsUpdatesBus extends EventEmitter {}
 
-const databaseBrandSchema = z.literal('postgresql');
-type DatabaseBrand = z.infer<typeof databaseBrandSchema>;
+const demandsUpdates = new DemandsUpdatesBus();
 
-const databaseURISchema = z.string();
-type DatabaseURI = z.infer<typeof databaseURISchema>;
+prisma.$use(async (params, next) => {
+    const result = await next(params);
 
-const suggestsSchema = z.unknown();
+    console.log(result);
 
-const migrationFileSchema = z.string();
+    // if (params?.model === 'Demand') {
+    //     demandsUpdates.emit('')
+    // }
 
-const createDemandDtoSchema = z.object({
-    database: databaseBrandSchema,
-    uri: databaseURISchema,
+    return result;
 });
-
-const updateDemandDtoSchema = z.object({
-    status: z.optional(demandStatusScheme),
-    suggests: z.optional(suggestsSchema),
-    migration_file: z.optional(migrationFileSchema),
-});
-
-type OnExportingMessage = {
-    demand_id: number;
-    database: DatabaseBrand;
-    uri: DatabaseURI;
-};
 
 export const demandsRoutes = Router();
 
@@ -62,7 +53,7 @@ demandsRoutes.post('/', async (req, res) => {
     };
 
     (await nats).publish(
-        'ON_EXPORTING',
+        'OnExporting',
         StringCodec().encode(JSON.stringify(message))
     );
 

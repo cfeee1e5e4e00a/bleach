@@ -13,7 +13,7 @@ async def run():
     async def handle_message(message):
         print(message)
 
-    await nats.subscribe('ON_ANALYZING', cb=handle_message)
+    await nats.subscribe('OnAnalyzing','Analyzer', cb=handle_message)
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
