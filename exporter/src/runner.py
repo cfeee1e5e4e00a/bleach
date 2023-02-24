@@ -1,4 +1,4 @@
-from libpy.messages import OnExportingMessage, OnAnalyzingMessage
+from messages import OnExportingMessage, OnAnalyzingMessage
 
 async def run_exporter(message: OnExportingMessage) -> OnAnalyzingMessage:
     columns = {

@@ -1,75 +1,77 @@
 version: '3.8'
 
 services:
-    database:
-        image: 'postgres:15-alpine'
-        restart: always
-        ports:
-            - '5432:5432'
-        volumes:
-            - database_data:/var/lib/postgresql/data
-        environment:
-            POSTGRES_DB: 'bleach'
-            POSTGRES_USER: 'uchansansan'
-            POSTGRES_PASSWORD: 'cfeee1e5e4e00a'
+  database:
+    image: 'postgres:15-alpine'
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: 'bleach'
+      POSTGRES_USER: 'uchansansan'
+      POSTGRES_PASSWORD: 'cfeee1e5e4e00a'
 
-    s3:
-        image: 'minio/minio'
-        restart: always
-        command: server --address ":9000" --console-address ":9001" /export
-        ports:
-            - '9000:9000'
-            - '9001:9001'
-        volumes:
-            - s3_data:/export
-            - s3_config:/root/.minio
-        environment:
-            MINIO_ROOT_USER: 'spooky-soup'
-            MINIO_ROOT_PASSWORD: 'cfeee1e5e4e00a'
+  s3:
+    image: 'minio/minio'
+    restart: always
+    command: server --address ":9000" --console-address ":9001" /export
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - s3_data:/export
+      - s3_config:/root/.minio
+    environment:
+      MINIO_ROOT_USER: 'spooky-soup'
+      MINIO_ROOT_PASSWORD: 'cfeee1e5e4e00a'
 
-    queue:
-        image: 'nats:2-alpine'
-        restart: always
-        ports:
-            - '4222:4222'
-            - '8222:8222'
+  queue:
+    image: 'nats:2-alpine'
+    restart: always
+    ports:
+      - '4222:4222'
+      - '8222:8222'
 
-    api:
-        build: './api'
-        restart: always
-        depends_on:
-            - database
-            - s3
-            - queue
-        ports:
-            - '3000:3000'
-        environment:
-            DATABASE_URL: 'postgresql://uchansansan:cfeee1e5e4e00a@database:5432/bleach?schema=public'
-            S3_USER: 'spooky-soup'
-            S3_PASSWORD: 'cfeee1e5e4e00a'
-            S3_PORT: '5432'
-            S3_HOST: 's3'
-            QUEUE_URL: 'queue:4222'
+  api:
+    build: './api'
+    restart: always
+    depends_on:
+      - database
+      - s3
+      - queue
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: 'postgresql://uchansansan:cfeee1e5e4e00a@database:5432/bleach?schema=public'
+      S3_USER: 'spooky-soup'
+      S3_PASSWORD: 'cfeee1e5e4e00a'
+      S3_PORT: '5432'
+      S3_HOST: 's3'
+      QUEUE_URL: 'queue:4222'
 
-    web:
-        build: './web'
-        restart: always
-        depends_on:
-            - api
-        ports:
-            - '80:80'
+  web:
+    build: './web'
+    restart: always
+    depends_on:
+      - api
+    expose:
+      - 8080
+    ports:
+      - '8080:8080'
 
-    exporter:
-        build: './exporter'
-        restart: always
-        depends_on:
-            - queue
-            - api
-        environment:
-            QUEUE_URL: 'queue:4222'
-            API_URL: 'http://api:3000'
+  exporter:
+    build: './exporter'
+    restart: always
+    depends_on:
+      - queue
+      - api
+    environment:
+      QUEUE_URL: 'queue:4222'
+      API_URL: 'http://api:3000'
 
 volumes:
-    database_data:
-    s3_data:
-    s3_config:
+  database_data:
+  s3_data:
+  s3_config:
