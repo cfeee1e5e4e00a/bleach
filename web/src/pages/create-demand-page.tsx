@@ -56,7 +56,7 @@ export const CreateDemandPage: FC = () => {
                     <input
                         className="border md:w-96 border-gray-200 rounded-md px-4 py-2"
                         {...register('uri')}
-                        placeholder="postgresql://user:password@host:port/database"
+                        placeholder="postgresql://user:password@host:port/database?scheme=scheme"
                     ></input>
                     <p className="text-red-500">{errors.uri?.message}</p>
                 </div>

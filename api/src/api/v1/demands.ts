@@ -47,7 +47,9 @@ demandsRoutes.post('/', async (req, res) => {
         data: { status: 'ON_EXPORTING' },
     });
 
-    const { scheme, host, port, userinfo, path: databaseName } = URI.parse(uri);
+    const { host, port, userinfo, path: databaseName, query } = URI.parse(uri);
+
+    const scheme = new URLSearchParams(query).get('scheme');
 
     const [user, password] = userinfo!.split(':');
 
