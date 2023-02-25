@@ -24,6 +24,7 @@
         "express-list-endpoints": "^6.0.0",
         "http-status": "^1.6.2",
         "nats": "^2.12.1",
+        "uri-js": "^4.4.1",
         "zod": "^3.20.6"
     }
 }

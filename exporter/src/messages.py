@@ -8,8 +8,13 @@ DatabaseBrand = Literal['postgresql']
 @dataclass
 class OnExportingMessage:
     demand_id: int
-    database: DatabaseBrand
-    uri: str
+    database_type: DatabaseBrand
+    db_name: str
+    user: str
+    password: str
+    host: str
+    port: int
+    schema: str
 
 @dataclass_json
 @dataclass
