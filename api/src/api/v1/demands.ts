@@ -2,7 +2,7 @@ import EventEmitter from 'node:events';
 import { Router } from 'express';
 import HttpStatus from 'http-status';
 import { StringCodec } from 'nats';
-import URI from 'uri-js';
+import * as URI from 'uri-js';
 import {
     type OnExportingMessage,
     createDemandDtoSchema,
