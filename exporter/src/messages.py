@@ -1,6 +1,7 @@
 from typing import Literal, Any
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
+from type_info import TypeInformation
 
 DatabaseBrand = Literal['postgresql']
 
@@ -20,5 +21,4 @@ class OnExportingMessage:
 @dataclass
 class OnAnalyzingMessage:
     demand_id: int
-    columns: dict[str, str]
-    samples: list[dict[str, Any]]
+    shema: dict[str, TypeInformation]

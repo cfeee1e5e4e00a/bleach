@@ -1,31 +1,7 @@
 from messages import OnExportingMessage, OnAnalyzingMessage
+from type_info import TypeInformation
 import psycopg2
-
-class TypeInformation:
-    human_type:str
-    type:str
-    is_nullable:bool
-    column_name:str
-    example_data:list[str]
-
-    def __init__(self, human_type, type, is_nullable, column_name) -> None:
-        self.human_type = human_type
-        self.type = type
-        self.is_nullable = is_nullable
-        self.column_name = column_name
-        self.example_data = []
-        pass
-    
-    def __str__(self) -> str:
-        return f"""
-        <human_type:{self.human_type}, 
-        type:{self.type}, 
-        is_nullable:{self.is_nullable}, 
-        column_name:{self.column_name}
-        example_data:{self.example_data}>
-        """
-    def __repr__(self) -> str:
-        return str(self)
+import asyncio
 
 # find's rows by table name and converts it to TypeInformation class
 def find_by_table(lst, table_name)->list[TypeInformation]:
@@ -79,18 +55,21 @@ async def run_exporter(message: OnExportingMessage):
             ORDER BY random ()
             LIMIT 3
             """)
-            column.example_data = list(map(str, cur))
+            column.example_data = list(map(str, map(lambda x: x[0], cur)))
     conn.close()
-    return table_with_columns
-    # response = OnAnalyzingMessage(demand_id=message.)
+    t = OnAnalyzingMessage(demand_id=message.demand_id, shema=table_with_columns)
+    print(t.to_json())
+    return t
 
-# t = OnExportingMessage()
-# t.demand_id = 12
-# t.database = 'postgresql'
-# t.db_name = 'demo'
-# t.host = 'localhost'
-# t.port = 5432
-# t.password = 'root'
-# t.user = 'root'
-# t.schema = 'bookings'
-# asyncio.run(run_exporter(t))
+t = OnExportingMessage(
+    demand_id=12,
+    database_type='postgresql',
+    db_name='demo',
+    user='root',
+    password='root',
+    host='localhost',
+    port=5432,
+    schema='bookings'
+)
+
+asyncio.run(run_exporter(t))
