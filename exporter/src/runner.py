@@ -61,15 +61,15 @@ async def run_exporter(message: OnExportingMessage):
     print(t.to_json())
     return t
 
-t = OnExportingMessage(
-    demand_id=12,
-    database_type='postgresql',
-    db_name='demo',
-    user='root',
-    password='root',
-    host='localhost',
-    port=5432,
-    schema='bookings'
-)
+# t = OnExportingMessage(
+#     demand_id=12,
+#     database_type='postgresql',
+#     db_name='demo',
+#     user='root',
+#     password='root',
+#     host='localhost',
+#     port=5432,
+#     schema='bookings'
+# )
 
-asyncio.run(run_exporter(t))
+# asyncio.run(run_exporter(t))
