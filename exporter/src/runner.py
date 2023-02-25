@@ -66,7 +66,7 @@ def export_tables(connection, schema: str) -> dict[str, TypeInformation]:
 
 
 async def run_exporter(message: OnExportingMessage):
-    conn = psycopg2.connect(dbname=message.db_name, user=message.user, password=message.password, host=message.host)
+    conn = psycopg2.connect(dbname=message.db_name, user=message.user, password=message.password, host=message.host, port=message.port)
     table_with_columns = export_tables(conn, message.schema)
     for table_name in table_with_columns.keys():
         for column in table_with_columns[table_name]:
