@@ -2,6 +2,7 @@ import EventEmitter from 'node:events';
 import { Router } from 'express';
 import HttpStatus from 'http-status';
 import { StringCodec } from 'nats';
+import URI from 'uri-js';
 import {
     type OnExportingMessage,
     createDemandDtoSchema,
@@ -40,16 +41,25 @@ demandsRoutes.post('/', async (req, res) => {
         return res.status(HttpStatus.BAD_REQUEST).send(dto.error);
     }
 
-    const { database, uri } = dto.data;
+    const { database: databaseType, uri } = dto.data;
 
     const demand = await prisma.demand.create({
         data: { status: 'ON_EXPORTING' },
     });
 
+    const { scheme, host, port, userinfo, path: databaseName } = URI.parse(uri);
+
+    const [user, password] = userinfo!.split(':');
+
     const message: OnExportingMessage = {
         demand_id: demand.id,
-        database,
-        uri,
+        database_type: databaseType,
+        schema: scheme!,
+        host: host!,
+        port: String(port!),
+        user,
+        password,
+        db_name: databaseName!,
     };
 
     (await nats).publish(

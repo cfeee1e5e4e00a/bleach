@@ -1,7 +1,12 @@
-import { type DatabaseBrand, type DatabaseURI } from './schemas/demand';
+import { type DatabaseBrand } from './schemas/demand';
 
 export type OnExportingMessage = {
     demand_id: number;
-    database: DatabaseBrand;
-    uri: DatabaseURI;
+    database_type: DatabaseBrand;
+    db_name: string;
+    user: string;
+    password: string;
+    host: string;
+    port: string;
+    schema: string;
 };

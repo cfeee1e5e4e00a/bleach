@@ -21,13 +21,13 @@ async def main():
         payload: OnExportingMessage = OnExportingMessage.from_json(message.data.decode('UTF-8'))
         print(f'{datetime.now()} received {payload}')
         result = await run_exporter(payload)
-        await nats.publish('OnAnalyzing', result.to_json().encode('UTF-8'))
-        print(f'{datetime.now()} sended {result}')
-        async with aiohttp.ClientSession() as session:
-            url = f'{os.environ.get("API_URL")}/api/v1/demands/{payload.demand_id}'
-            body = { 'status': 'ON_ANALYZING' }
-            await session.put(url, json=body)
-
+        print(result)
+        # await nats.publish('OnAnalyzing', result.to_json().encode('UTF-8'))
+        # print(f'{datetime.now()} sended {result}')
+        # async with aiohttp.ClientSession() as session:
+        #     url = f'{os.environ.get("API_URL")}/api/v1/demands/{payload.demand_id}'
+        #     body = { 'status': 'ON_ANALYZING' }
+        #     await session.put(url, json=body)
 
     await nats.subscribe('OnExporting', 'Exporter', cb=handle_message)
 
