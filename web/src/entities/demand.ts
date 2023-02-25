@@ -1,9 +1,19 @@
-import { DemandStatus as DemandStatusEnum } from '@prisma/client';
 import { z } from 'zod';
 
-export { Demand } from '@prisma/client';
+export type Demand = {
+    id: number;
+    status: DemandStatus;
+    suggests?: unknown;
+    migration_file?: string;
+};
 
-export const demandStatusScheme = z.nativeEnum(DemandStatusEnum);
+export const demandStatusScheme = z.enum([
+    'ON_EXPORTING',
+    'ON_ANALYZING',
+    'ON_VERIFICATION',
+    'ON_MIGRATION_GENERATION',
+    'DONE',
+]);
 export type DemandStatus = z.infer<typeof demandStatusScheme>;
 
 export const databaseBrandSchema = z.literal('postgresql', {

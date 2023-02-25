@@ -13,17 +13,17 @@ class DemandsUpdatesBus extends EventEmitter {}
 
 const demandsUpdates = new DemandsUpdatesBus();
 
-prisma.$use(async (params, next) => {
-    const result = await next(params);
+// prisma.$use(async (params, next) => {
+//     const result = await next(params);
 
-    console.log(result);
+//     console.log(result);
 
-    // if (params?.model === 'Demand') {
-    //     demandsUpdates.emit('')
-    // }
+//     // if (params?.model === 'Demand') {
+//     //     demandsUpdates.emit('')
+//     // }
 
-    return result;
-});
+//     return result;
+// });
 
 export const demandsRoutes = Router();
 

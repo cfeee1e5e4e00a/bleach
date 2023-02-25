@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY prisma/ ./
-RUN npx prisma generate
+RUN npm run prisma:generate
 COPY . .
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:prod"]

@@ -59,7 +59,9 @@ services:
     expose:
       - 8080
     ports:
-      - '8080:8080'
+      - '1488:80'
+    environment:
+      VITE_API_BASE: 'http://bleach.cfeee1e5e4e00a.ru'
 
   exporter:
     build: './exporter'

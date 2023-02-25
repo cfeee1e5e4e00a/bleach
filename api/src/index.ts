@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import printEndpoints from 'express-list-endpoints';
 import { PrismaClient } from '@prisma/client';
 import { EventEmitter } from 'events';
@@ -12,6 +13,7 @@ export const prisma = new PrismaClient();
 export const nats = connect({ servers: QUEUE_URL });
 
 const app = express()
+    .use(cors())
     .use(express.json())
     .use('/api/v1', v1Routes)
     .on('close', async () => {

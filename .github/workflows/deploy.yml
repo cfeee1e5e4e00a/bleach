@@ -1,0 +1,31 @@
+name: deploy on stand
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: stand
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: stand
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v3
+
+      - name: setup ssh
+        uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
+        with:
+          NAME: remote
+          USER: ${{ secrets.SSH_USER }}
+          ORIGIN: ${{ secrets.SSH_ORIGIN }}
+          PORT: ${{ secrets.SSH_PORT }}
+          SSHKEY: ${{ secrets.SSH_KEY }}
+
+      - name: deploy
+        run: |
+          docker context create --docker host=ssh://remote remote
+          docker context use remote
+          docker compose up -d --build
