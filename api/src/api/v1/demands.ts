@@ -59,7 +59,7 @@ demandsRoutes.post('/', async (req, res) => {
         port: String(port!),
         user,
         password,
-        db_name: databaseName!,
+        db_name: databaseName!.replace('/', ''),
     };
 
     (await nats).publish(
