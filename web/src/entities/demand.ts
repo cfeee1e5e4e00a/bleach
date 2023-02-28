@@ -1,20 +1,32 @@
 import { z } from 'zod';
 
-export type Demand = {
+export type DemandOnExporting = {
     id: number;
-    status: DemandStatus;
-    suggests?: unknown;
-    migration_file?: string;
+    status: 'ON_EXPORTING';
+    uri: DatabaseURI;
 };
 
-export const demandStatusScheme = z.enum([
-    'ON_EXPORTING',
-    'ON_ANALYZING',
-    'ON_VERIFICATION',
-    'ON_MIGRATION_GENERATION',
-    'DONE',
-]);
-export type DemandStatus = z.infer<typeof demandStatusScheme>;
+export type DemandOnAnalyzing = {
+    id: number;
+    status: 'ON_ANALYZING';
+    uri: DatabaseURI;
+    schema: DatabaseSchema;
+};
+
+export type DemanOnVerification = {
+    id: number;
+    status: 'ON_VERIFICATION';
+    uri: DatabaseURI;
+    schema: DatabaseSchema;
+    suggests: object;
+};
+
+export type Demand =
+    | DemandOnExporting
+    | DemandOnAnalyzing
+    | DemanOnVerification;
+
+export type DemandStatus = Demand['status'];
 
 export const databaseBrandSchema = z.literal('postgresql', {
     invalid_type_error: 'Такая база данных не поддерживается',
@@ -24,19 +36,18 @@ export type DatabaseBrand = z.infer<typeof databaseBrandSchema>;
 export const databaseURISchema = z.string().url({ message: 'Неверный URI' });
 export type DatabaseURI = z.infer<typeof databaseURISchema>;
 
-export const suggestsSchema = z.unknown();
+export type DatabaseSchemaColumn = {
+    human_type: string;
+    type: string;
+    is_nullable: boolean;
+    column_name: string;
+    example_data: string[];
+};
 
-export const migrationFileSchema = z.string();
+export type DatabaseSchema = Record<string, DatabaseSchemaColumn>;
 
 export const createDemandDtoSchema = z.object({
     database: databaseBrandSchema,
     uri: databaseURISchema,
 });
 export type CreateDemandDto = z.infer<typeof createDemandDtoSchema>;
-
-export const updateDemandDtoSchema = z.object({
-    status: z.optional(demandStatusScheme),
-    suggests: z.optional(suggestsSchema),
-    migration_file: z.optional(migrationFileSchema),
-});
-export type UpdateDemandDtoSchema = z.infer<typeof updateDemandDtoSchema>;

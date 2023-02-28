@@ -8,14 +8,14 @@ import {
     DatabaseBrand,
 } from '@/entities/demand';
 import { stringUnionToArray } from '@/utils/string-union-to-array';
-import { useDemands } from '@/hooks/useDemands';
+import { useAllDemands } from '@/hooks/useAllDemands';
 
 const databaseBrands = stringUnionToArray<DatabaseBrand>()('postgresql');
 
 export const CreateDemandPage: FC = () => {
     const navigate = useNavigate();
 
-    const { create } = useDemands();
+    const { create } = useAllDemands();
 
     const {
         register,
@@ -54,7 +54,7 @@ export const CreateDemandPage: FC = () => {
                 <div className="flex flex-col gap-2">
                     <p>URI</p>
                     <input
-                        className="border md:w-96 border-gray-200 rounded-md px-4 py-2"
+                        className="border md:w-[32.5rem] border-gray-200 rounded-md px-4 py-2"
                         {...register('uri')}
                         placeholder="postgresql://user:password@host:port/database?scheme=scheme"
                     ></input>

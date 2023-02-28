@@ -3,28 +3,42 @@ import { Router } from 'express';
 import HttpStatus from 'http-status';
 import { StringCodec } from 'nats';
 import * as URI from 'uri-js';
+import { match, P } from 'ts-pattern';
 import {
     type OnExportingMessage,
+    type Demand,
     createDemandDtoSchema,
     updateDemandDtoSchema,
 } from '../../../lib';
-import { nats, prisma } from '../..';
+import { nats } from '../..';
+import { prisma } from '../../prisma';
 
 class DemandsUpdatesBus extends EventEmitter {}
 
 const demandsUpdates = new DemandsUpdatesBus();
 
-// prisma.$use(async (params, next) => {
-//     const result = await next(params);
+prisma.$connect().then(() => {
+    console.log('registered demands middleware');
+    prisma.$use(async (params, next) => {
+        const result = await next(params);
 
-//     console.log(result);
+        match({ params, result })
+            .with(
+                {
+                    params: {
+                        model: 'Demand',
+                        action: P.union('update', 'create'),
+                    },
+                },
+                ({ result }) => {
+                    demandsUpdates.emit('data', result);
+                }
+            )
+            .otherwise(() => {});
 
-//     // if (params?.model === 'Demand') {
-//     //     demandsUpdates.emit('')
-//     // }
-
-//     return result;
-// });
+        return result;
+    });
+});
 
 export const demandsRoutes = Router();
 
@@ -32,6 +46,60 @@ demandsRoutes.get('/', async (req, res) => {
     const demands = await prisma.demand.findMany();
 
     return res.send(demands);
+});
+
+demandsRoutes.get('/events', async (req, res) => {
+    res.writeHead(HttpStatus.OK, {
+        'Content-Type': 'text/event-stream',
+        Connection: 'keep-alive',
+        'Cache-Control': 'no-cache',
+    });
+
+    const dataHandler = (data: Demand) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    demandsUpdates.on('data', dataHandler);
+
+    req.on('close', () => {
+        demandsUpdates.removeListener('data', dataHandler);
+    });
+});
+
+demandsRoutes.get('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const demand = await prisma.demand.findUnique({
+        where: { id: Number(id) },
+    });
+
+    if (!demand) {
+        return res.status(HttpStatus.NOT_FOUND);
+    } else {
+        return res.send(demand);
+    }
+});
+
+demandsRoutes.get('/:id/events', async (req, res) => {
+    const { id } = req.params;
+
+    res.writeHead(HttpStatus.OK, {
+        'Content-Type': 'text/event-stream',
+        Connection: 'keep-alive',
+        'Cache-Control': 'no-cache',
+    });
+
+    const dataHandler = (data: Demand) => {
+        if (data.id === Number(id)) {
+            res.write(`data: ${JSON.stringify(data)}\n\n`);
+        }
+    };
+
+    demandsUpdates.addListener('data', dataHandler);
+
+    req.on('close', () => {
+        demandsUpdates.removeListener('data', dataHandler);
+    });
 });
 
 demandsRoutes.post('/', async (req, res) => {

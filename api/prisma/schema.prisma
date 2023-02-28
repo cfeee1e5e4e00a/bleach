@@ -10,6 +10,8 @@ datasource db {
 model Demand {
     id             Int          @id @default(autoincrement())
     status         DemandStatus
+    uri            String?
+    schema         Json?
     suggests       Json?
     migration_file String?
 }

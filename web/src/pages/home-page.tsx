@@ -1,19 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import { useDemands } from '@/hooks/useDemands';
+import { useAllDemands } from '@/hooks/useAllDemands';
 import { displayDemandStatus } from '@/utils/display-demand-status';
 
 export const HomePage = () => {
     const navigate = useNavigate();
 
-    const { all: demands } = useDemands({ all: true });
+    const { demands } = useAllDemands();
 
     return (
         <main className="flex flex-col gap-8 items-center md:py-10 md:px-24 w-full flex-grow">
             <h1 className="text-3xl">Заявки</h1>
             <ul className="flex flex-col gap-4 md:w-96">
                 <li
-                    className="w-full p-4 flex flex-row justify-center gap-2 items-center border border-gray-200 bg-green-500 rounded-md cursor-pointer hover:scale-95 hover:bg-gray-50 transition duration-75 text-white"
+                    className="w-full p-4 flex flex-row justify-center gap-2 items-center border border-gray-200 bg-green-500 rounded-md cursor-pointer hover:scale-95 transition duration-75 text-white"
                     onClick={() => navigate(`/create-demand`)}
                 >
                     <span>Создать заявку</span>
