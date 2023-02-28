@@ -57,7 +57,7 @@ async def run_exporter(message: OnExportingMessage):
             """)
             column.example_data = list(map(str, map(lambda x: x[0], cur)))
     conn.close()
-    t = OnAnalyzingMessage(demand_id=message.demand_id, shema=table_with_columns)
+    t = OnAnalyzingMessage(demand_id=message.demand_id, schema=table_with_columns)
     return t
 
 # t = OnExportingMessage(

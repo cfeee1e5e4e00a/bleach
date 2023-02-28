@@ -21,4 +21,4 @@ class OnExportingMessage:
 @dataclass
 class OnAnalyzingMessage:
     demand_id: int
-    shema: dict[str, TypeInformation]
+    schema: dict[str, TypeInformation]
