@@ -1,4 +1,4 @@
-from typing import Literal, Any
+from typing import Literal
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 from type_info import TypeInformation
@@ -21,4 +21,4 @@ class OnExportingMessage:
 @dataclass
 class OnAnalyzingMessage:
     demand_id: int
-    schema: dict[str, TypeInformation]
+    schema: dict[str, list[TypeInformation]]
