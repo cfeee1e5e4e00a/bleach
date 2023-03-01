@@ -1,4 +1,4 @@
-import { type DatabaseBrand } from './schemas/demand';
+import { type MigrationPlan, type DatabaseBrand } from './schemas/demand';
 
 export type OnExportingMessage = {
     demand_id: number;
@@ -9,4 +9,9 @@ export type OnExportingMessage = {
     host: string;
     port: string;
     schema: string;
+};
+
+export type OnMigrationGenerationMessage = {
+    demand_id: number;
+    plan: MigrationPlan;
 };

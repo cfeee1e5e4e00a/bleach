@@ -9,7 +9,6 @@ export const useAllDemandsSubscribe = () => {
         const sse = new EventSource(`${baseURL}/api/v1/demands/events`);
 
         const onMessage = (event: MessageEvent<string>) => {
-            console.log('received onAllDemands', event.data);
             setRealtimeData(JSON.parse(event.data));
         };
 

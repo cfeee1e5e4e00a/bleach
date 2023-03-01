@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { Demand } from '@/entities/demand';
-import { getDemandById } from '@/api/demands';
+import { getDemandById, submitDemandVerification } from '@/api/demands';
 import { useDemandByIdSubscribe } from '@/hooks/useDemandByIdSubscribe';
 
 const mergeDataSources = (
@@ -15,13 +15,25 @@ const mergeDataSources = (
 };
 
 export const useDemandById = (id?: number | string) => {
-    const { data: apiData } = useSWR(id ? ['demands', id] : null, ([url, id]) =>
-        getDemandById(id)
+    const { data: apiData, mutate } = useSWR(
+        id ? ['demands', id] : null,
+        ([url, id]) => getDemandById(id)
     );
 
-    const realtimeData = useDemandByIdSubscribe(id);
+    let realtimeData = useDemandByIdSubscribe(id);
+
+    const submitVerification = async (
+        dto: Parameters<typeof submitDemandVerification>[1]
+    ) => {
+        if (!id) return;
+        const updated = await submitDemandVerification(id, dto);
+        realtimeData = undefined;
+        await mutate(updated);
+        return updated;
+    };
 
     return {
         demand: mergeDataSources(apiData, realtimeData),
+        submitVerification,
     };
 };

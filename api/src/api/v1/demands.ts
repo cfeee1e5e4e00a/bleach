@@ -9,6 +9,7 @@ import {
     type Demand,
     createDemandDtoSchema,
     updateDemandDtoSchema,
+    OnMigrationGenerationMessage,
 } from '../../../lib';
 import { nats } from '../..';
 import { prisma } from '../../prisma';
@@ -112,7 +113,10 @@ demandsRoutes.post('/', async (req, res) => {
     const { database: databaseType, uri } = dto.data;
 
     const demand = await prisma.demand.create({
-        data: { status: 'ON_EXPORTING' },
+        data: {
+            status: 'ON_EXPORTING',
+            uri,
+        },
     });
 
     const { host, port, userinfo, path: databaseName, query } = URI.parse(uri);
@@ -155,12 +159,36 @@ demandsRoutes.put('/:id', async (req, res) => {
         return res.status(HttpStatus.BAD_REQUEST).send(dto.error);
     }
 
-    const { migration_file, status, suggests } = dto.data;
+    const { migration_file, status, suggests, schema, plan } = dto.data;
 
     const demand = await prisma.demand.update({
         where: { id: Number(id) },
-        data: { status, migration_file, suggests: suggests as object },
+        data: {
+            status,
+            migration_file,
+            suggests,
+            schema: schema ? JSON.parse(schema) : undefined,
+            plan,
+        },
     });
+
+    if (status === 'ON_MIGRATION_GENERATION' && plan) {
+        const message: OnMigrationGenerationMessage = {
+            demand_id: Number(id),
+            plan,
+        };
+
+        (await nats).publish(
+            'ON_MIGRATION_GENERATION',
+            StringCodec().encode(JSON.stringify(message))
+        );
+
+        console.log(
+            new Date().toDateString(),
+            'sended OnMigrationGenerationMessage',
+            message
+        );
+    }
 
     return demand;
 });

@@ -1,13 +1,16 @@
 import { Database } from '@/containers/database';
+import { MigrationPlan } from '@/entities/demand';
 import { useDemandById } from '@/hooks/useDemandById';
 import { displayDemandStatus } from '@/utils/display-demand-status';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export const DemandPage: FC = () => {
     const { id } = useParams();
 
-    const { demand } = useDemandById(id);
+    const { demand, submitVerification } = useDemandById(id);
+
+    const [plan, setPlan] = useState<MigrationPlan>({});
 
     if (!demand) {
         return (
@@ -19,47 +22,34 @@ export const DemandPage: FC = () => {
 
     return (
         <main className="flex flex-col items-center justify-center flex-grow w-full md:p-12 gap-8">
-            <h1 className="text-3xl">
-                Заявка #{id} {displayDemandStatus(demand.status)}
-            </h1>
-            <Database
-                demand={{
-                    id: 228,
-                    status: 'ON_VERIFICATION',
-                    uri: 'postgresql://postgres:root@217.71.129.139:4070/demo?scheme=bookings',
-                    schema: {
-                        name: {
-                            column_name: 'name',
-                            example_data: [
-                                'Максим',
-                                'Саша',
-                                'Леша',
-                                'Максим',
-                                'Саша',
-                                'Леша',
-                            ],
-                            is_nullable: false,
-                            human_type: 'text',
-                            type: 'text',
-                        },
-                        email: {
-                            column_name: 'email',
-                            example_data: [
-                                'nerlihmax@ya.ru',
-                                'anarcom@gmail.com',
-                                'uchansansan@g.nsu.ru',
-                                'nerlihmax@ya.ru',
-                                'anarcom@gmail.com',
-                                'uchansansan@g.nsu.ru',
-                            ],
-                            is_nullable: false,
-                            human_type: 'text',
-                            type: 'text',
-                        },
-                    },
-                    suggests: {},
-                }}
-            />
+            <div className="flex flex-row items-center justify-between w-full">
+                <h1 className="text-3xl">
+                    Заявка #{id} - {displayDemandStatus(demand.status)}
+                </h1>
+                {demand.status === 'ON_VERIFICATION' && (
+                    <button
+                        className="px-8 py-2 rounded-md transition duration-75 hover:scale-110 bg-green-500 text-xl text-white"
+                        onClick={() =>
+                            submitVerification({
+                                status: 'ON_MIGRATION_GENERATION',
+                                plan,
+                            })
+                        }
+                    >
+                        Готово
+                    </button>
+                )}
+            </div>
+            {demand.status === 'ON_ANALYZING' && (
+                <Database schema={demand.schema.schema} />
+            )}
+            {demand.status === 'ON_VERIFICATION' && (
+                <Database
+                    schema={demand.schema.schema}
+                    suggests={demand.suggests}
+                    onSelect={setPlan}
+                />
+            )}
         </main>
     );
 };

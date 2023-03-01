@@ -1,3 +1,4 @@
+import { stringUnionToArray } from '@/utils/string-union-to-array';
 import { z } from 'zod';
 
 export type DemandOnExporting = {
@@ -10,31 +11,33 @@ export type DemandOnAnalyzing = {
     id: number;
     status: 'ON_ANALYZING';
     uri: DatabaseURI;
-    schema: DatabaseSchema;
+    schema: { schema: DatabaseSchema };
 };
 
-export type DemanOnVerification = {
+export type DemandOnVerification = {
     id: number;
     status: 'ON_VERIFICATION';
     uri: DatabaseURI;
-    schema: DatabaseSchema;
-    suggests: object;
+    schema: { schema: DatabaseSchema };
+    suggests: DatabaseSuggest[];
+};
+
+export type DemandOnMigrationGeneration = {
+    id: number;
+    status: 'ON_MIGRATION_GENERATION';
+    uri: DatabaseURI;
+    schema: { schema: DatabaseSchema };
+    suggests: DatabaseSuggest[];
+    plan: MigrationPlan;
 };
 
 export type Demand =
     | DemandOnExporting
     | DemandOnAnalyzing
-    | DemanOnVerification;
+    | DemandOnVerification
+    | DemandOnMigrationGeneration;
 
 export type DemandStatus = Demand['status'];
-
-export const databaseBrandSchema = z.literal('postgresql', {
-    invalid_type_error: 'Такая база данных не поддерживается',
-});
-export type DatabaseBrand = z.infer<typeof databaseBrandSchema>;
-
-export const databaseURISchema = z.string().url({ message: 'Неверный URI' });
-export type DatabaseURI = z.infer<typeof databaseURISchema>;
 
 export type DatabaseSchemaColumn = {
     human_type: string;
@@ -44,10 +47,50 @@ export type DatabaseSchemaColumn = {
     example_data: string[];
 };
 
-export type DatabaseSchema = Record<string, DatabaseSchemaColumn>;
+export const anonymizingMethods = stringUnionToArray<AnonymizingMethod>()(
+    'skip',
+    'mobile_phone'
+);
+
+export const anonymizingMethodSchema = z.union([
+    z.literal('skip'),
+    z.literal('mobile_phone'),
+]);
+export type AnonymizingMethod = z.infer<typeof anonymizingMethodSchema>;
+
+export const migrationPlanSchema = z.record(
+    z.string(),
+    z.record(z.string(), anonymizingMethodSchema)
+);
+export type MigrationPlan = z.infer<typeof migrationPlanSchema>;
+
+export type DatabaseSuggest = {
+    table: string;
+    column: string;
+    method: AnonymizingMethod;
+};
+
+export type DatabaseSchema = Record<string, DatabaseSchemaColumn[]>;
+
+export const databaseBrandSchema = z.literal('postgresql', {
+    invalid_type_error: 'Такая база данных не поддерживается',
+});
+export type DatabaseBrand = z.infer<typeof databaseBrandSchema>;
+
+export const databaseURISchema = z.string().url({ message: 'Неверный URI' });
+export type DatabaseURI = z.infer<typeof databaseURISchema>;
 
 export const createDemandDtoSchema = z.object({
     database: databaseBrandSchema,
     uri: databaseURISchema,
 });
 export type CreateDemandDto = z.infer<typeof createDemandDtoSchema>;
+
+export const submitDemandVerificationDtoSchema = z.object({
+    status: z.literal('ON_MIGRATION_GENERATION'),
+    plan: migrationPlanSchema,
+});
+
+export type SubmitDemandVerificationDto = z.infer<
+    typeof submitDemandVerificationDtoSchema
+>;
