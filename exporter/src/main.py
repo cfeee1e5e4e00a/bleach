@@ -17,8 +17,6 @@ async def main():
     await nats.connect(os.environ.get('QUEUE_URL'))
 
     print(f'{datetime.now()} connected to queue')
-    
-    api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')
 
     async def handle_message(message: Msg):
         payload: OnExportingMessage = OnExportingMessage.from_json(message.data.decode('UTF-8'))
@@ -29,9 +27,11 @@ async def main():
         print(f'{datetime.now()} sended {result_message}')
         parsed = loads(result_message)
         del parsed['demand_id']
+        api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')
         await api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_ANALYZING', 'schema': dumps(parsed)})
+        await api.close()
 
-    await nats.subscribe('OnExporting', 'Exporter', cb=handle_message)
+    await nats.subscribe('OnExporting', cb=handle_message)
 
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()

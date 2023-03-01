@@ -16,14 +16,27 @@ export type DatabaseURI = z.infer<typeof databaseURISchema>;
 
 export const anonymizingMethodSchema = z.union([
     z.literal('skip'),
-    z.literal('mobile_phone'),
+    z.literal('passport'),
+    z.literal('email'),
+    z.literal('phone'),
+    z.literal('birth date'),
+    z.literal('fio'),
+    z.literal('ipv4'),
+    z.literal('ipv6'),
+    z.literal('mac'),
+    z.literal('inn'),
+    z.literal('index'),
+    z.literal('region'),
+    z.literal('ts'),
+    z.literal('bank card'),
 ]);
 export type AnonymizingMethod = z.infer<typeof anonymizingMethodSchema>;
 
-export const suggestsSchema = z.record(
-    z.string(),
-    z.record(z.string(), anonymizingMethodSchema)
-);
+// export const suggestsSchema = z.record(
+//     z.string(),
+//     z.record(z.string(), anonymizingMethodSchema)
+// );
+export const suggestsSchema = z.string();
 export type SuggestsSchema = z.infer<typeof suggestsSchema>;
 
 export const databaseSchemaSchema = z.string();

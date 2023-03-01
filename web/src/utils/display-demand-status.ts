@@ -7,5 +7,5 @@ export const displayDemandStatus = (status: DemandStatus) =>
         .with('ON_ANALYZING', () => 'анализируется')
         .with('ON_VERIFICATION', () => 'требуется валидация')
         .with('ON_MIGRATION_GENERATION', () => 'генерируется миграция')
-        .with('DONE', () => 'обработана')
+        // .with('DONE', () => 'обработана')
         .exhaustive();

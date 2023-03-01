@@ -49,12 +49,36 @@ export type DatabaseSchemaColumn = {
 
 export const anonymizingMethods = stringUnionToArray<AnonymizingMethod>()(
     'skip',
-    'mobile_phone'
+    'passport',
+    'email',
+    'phone',
+    'birth date',
+    'fio',
+    'ipv4',
+    'ipv6',
+    'mac',
+    'inn',
+    'index',
+    'region',
+    'ts',
+    'bank card'
 );
 
 export const anonymizingMethodSchema = z.union([
     z.literal('skip'),
-    z.literal('mobile_phone'),
+    z.literal('passport'),
+    z.literal('email'),
+    z.literal('phone'),
+    z.literal('birth date'),
+    z.literal('fio'),
+    z.literal('ipv4'),
+    z.literal('ipv6'),
+    z.literal('mac'),
+    z.literal('inn'),
+    z.literal('index'),
+    z.literal('region'),
+    z.literal('ts'),
+    z.literal('bank card'),
 ]);
 export type AnonymizingMethod = z.infer<typeof anonymizingMethodSchema>;
 

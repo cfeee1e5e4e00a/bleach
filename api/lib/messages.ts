@@ -13,5 +13,6 @@ export type OnExportingMessage = {
 
 export type OnMigrationGenerationMessage = {
     demand_id: number;
+    uri: string;
     plan: MigrationPlan;
 };

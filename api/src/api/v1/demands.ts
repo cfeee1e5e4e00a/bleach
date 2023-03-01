@@ -156,6 +156,7 @@ demandsRoutes.put('/:id', async (req, res) => {
     const dto = await updateDemandDtoSchema.safeParseAsync(req.body);
 
     if (dto.success === false) {
+        console.error('Bad request', req.url, req.body);
         return res.status(HttpStatus.BAD_REQUEST).send(dto.error);
     }
 
@@ -166,7 +167,7 @@ demandsRoutes.put('/:id', async (req, res) => {
         data: {
             status,
             migration_file,
-            suggests,
+            suggests: suggests ? JSON.parse(suggests) : undefined,
             schema: schema ? JSON.parse(schema) : undefined,
             plan,
         },
@@ -176,10 +177,11 @@ demandsRoutes.put('/:id', async (req, res) => {
         const message: OnMigrationGenerationMessage = {
             demand_id: Number(id),
             plan,
+            uri: demand.uri!,
         };
 
         (await nats).publish(
-            'ON_MIGRATION_GENERATION',
+            'OnMigrationGeneration',
             StringCodec().encode(JSON.stringify(message))
         );
 
