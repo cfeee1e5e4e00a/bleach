@@ -5,6 +5,8 @@ CREATE TYPE "DemandStatus" AS ENUM ('ON_EXPORTING', 'ON_ANALYZING', 'ON_VERIFICA
 CREATE TABLE "Demand" (
     "id" SERIAL NOT NULL,
     "status" "DemandStatus" NOT NULL,
+    "uri" TEXT,
+    "schema" JSONB,
     "suggests" JSONB,
     "migration_file" TEXT,
 
