@@ -56,6 +56,9 @@ services:
     restart: always
     depends_on:
       - api
+      - exporter
+      - analyzer
+      - migrator
     expose:
       - 8080
     ports:
@@ -65,6 +68,26 @@ services:
 
   exporter:
     build: './exporter'
+    restart: always
+    depends_on:
+      - queue
+      - api
+    environment:
+      QUEUE_URL: 'queue:4222'
+      API_URL: 'http://api:3000'
+
+  analyzer:
+    build: './analyzer'
+    restart: always
+    depends_on:
+      - queue
+      - api
+    environment:
+      QUEUE_URL: 'queue:4222'
+      API_URL: 'http://api:3000'
+
+  migrator:
+    build: './migrator'
     restart: always
     depends_on:
       - queue
