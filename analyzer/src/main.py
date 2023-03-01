@@ -27,7 +27,8 @@ async def main():
         result_message = Suggest.schema().dumps(suggests ,many=True)
         print(f'{datetime.now()} sended {result_message}')
         api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')
-        await api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_VERIFICATION', 'suggests': result_message})
+        async with api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_VERIFICATION', 'suggests': result_message}) as resp:
+            await resp.text()
         await api.close()
 
     await nats.subscribe('OnAnalyzing', cb=handle_message)
@@ -36,5 +37,7 @@ if __name__ == '__main__':
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(main())
-    loop.run_forever()
-    loop.close()
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()

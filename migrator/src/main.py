@@ -10,7 +10,7 @@ import aiohttp
 
 load_dotenv()
 
-async def main():
+async def main(loop):
     nats = Nats()
 
     await nats.connect(os.environ.get('QUEUE_URL'))
@@ -32,6 +32,8 @@ async def main():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(main())
-    loop.run_forever()
-    loop.close()
+    loop.run_until_complete(main(loop))
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()

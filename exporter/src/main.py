@@ -28,7 +28,8 @@ async def main():
         parsed = loads(result_message)
         del parsed['demand_id']
         api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')
-        await api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_ANALYZING', 'schema': dumps(parsed)})
+        async with api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_ANALYZING', 'schema': dumps(parsed)}) as resp:
+            await resp.text()
         await api.close()
 
     await nats.subscribe('OnExporting', cb=handle_message)
@@ -37,5 +38,7 @@ if __name__ == '__main__':
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(main())
-    loop.run_forever()
-    loop.close()
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()
