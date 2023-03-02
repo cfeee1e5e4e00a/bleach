@@ -3,3 +3,4 @@ python-dotenv
 dataclasses-json
 dacite
 aiohttp
+requests

@@ -3,3 +3,4 @@ python-dotenv
 dataclasses-json
 aiohttp
 psycopg2-binary
+requests

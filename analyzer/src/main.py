@@ -26,7 +26,7 @@ async def main():
         suggests = await run_analyzer(payload)
         result_message = Suggest.schema().dumps(suggests ,many=True)
         print(f'{datetime.now()} sended {result_message}')
-        api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')
+        api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}', timeout=aiohttp.ClientTimeout(total=5))
         async with api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_VERIFICATION', 'suggests': result_message}) as resp:
             await resp.text()
         await api.close()

@@ -192,5 +192,5 @@ demandsRoutes.put('/:id', async (req, res) => {
         );
     }
 
-    return demand;
+    return res.status(HttpStatus.OK).send(demand);
 });

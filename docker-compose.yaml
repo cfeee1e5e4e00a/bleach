@@ -85,6 +85,8 @@ services:
     environment:
       QUEUE_URL: 'queue:4222'
       API_URL: 'http://api:3000'
+    volumes:
+      - ./migrations:/app/migrations
 
   migrator:
     build: './migrator'

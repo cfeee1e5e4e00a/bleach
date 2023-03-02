@@ -7,6 +7,7 @@ from nats.aio.msg import Msg
 from messages import OnMigrationGenerationMessage
 from runner import run_migrator
 import aiohttp
+import pathlib
 
 load_dotenv()
 
@@ -20,7 +21,12 @@ async def main(loop):
     async def handle_message(message: Msg):
         payload = OnMigrationGenerationMessage.from_json(message.data.decode('UTF-8'))
         print(f'{datetime.now()} received {payload}')
-        await run_migrator(payload)
+        migration = await run_migrator(payload)
+        pathlib.Path('./migrations').mkdir(parents=True, exist_ok=True)
+        file = open(f'./migrations/migration-{payload.demand_id}.sql', 'w')
+        file.write(migration)
+        file.close()
+        print(f'{datetime.now()} generating migration-{payload.demand_id}.sql done')
 
         # print(f'{datetime.now()} sended {result_message}')
         # api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')

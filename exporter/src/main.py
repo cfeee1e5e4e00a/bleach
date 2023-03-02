@@ -27,7 +27,7 @@ async def main():
         print(f'{datetime.now()} sended {result_message}')
         parsed = loads(result_message)
         del parsed['demand_id']
-        api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}')
+        api = aiohttp.ClientSession(f'{os.environ.get("API_URL")}', timeout=aiohttp.ClientTimeout(total=5))
         async with api.put(f'/api/v1/demands/{payload.demand_id}', json={'status': 'ON_ANALYZING', 'schema': dumps(parsed)}) as resp:
             await resp.text()
         await api.close()
